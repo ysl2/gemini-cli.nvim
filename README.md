@@ -1,0 +1,73 @@
+# gemini.nvim
+
+An unofficial Neovim plugin to interact with the Google Gemini CLI within a persistent terminal window.
+
+## Features
+
+- Run the `gemini` CLI in a terminal session that persists in the background.
+- Toggle the terminal window's visibility with a single command or keymap.
+- Choose between a floating window or a vertical side panel.
+- Highly configurable window geometry and keymaps.
+- Integrates with Neovim's native `:checkhealth` system.
+
+## Requirements
+
+- Neovim >= 0.8
+- [Google Gemini CLI](https://github.com/google/gemini-cli) installed and available in your `$PATH`.
+- Node.js >= 20
+
+## Installation
+
+Here is an example using `lazy.nvim`. As this plugin is currently part of a monorepo, you would need to point the `dir` to the local path of the package.
+
+```lua
+-- lazy.nvim spec
+{
+  -- This path assumes you have the gemini-cli repository cloned locally.
+  dir = '~/path/to/your/gemini-cli/packages/nvim',
+
+  -- Or, if you were to publish this as a standalone plugin:
+  -- 'your-github-name/gemini.nvim',
+
+  config = function()
+    require('gemini-nvim').setup({
+      -- Your configuration goes here
+    })
+  end,
+}
+```
+
+## Configuration
+
+Call the `setup` function to configure the plugin. Here are all the available options with their default values:
+
+```lua
+-- init.lua
+
+require('gemini-nvim').setup({
+  -- The style of the window to open.
+  -- Can be 'float' or 'side'.
+  window_style = 'float',
+
+  -- For `window_style = 'side'`.
+  -- Can be 'left' or 'right'.
+  side_position = 'right',
+
+  -- For `window_style = 'float'`.
+  -- Values are a percentage of the editor's dimensions.
+  float_width_ratio = 0.8,
+  float_height_ratio = 0.8,
+
+  -- Whether to create the default keymap for toggling the window.
+  set_default_keymap = true,
+
+  -- The keymap to use for toggling the window.
+  toggle_keymap = '<F3>',
+})
+```
+
+## Usage
+
+- `:Gemini`: Toggles the Gemini terminal window (opens, hides, or shows it).
+- Press `<F3>` (or your configured keymap) to do the same.
+- `:checkhealth gemini`: Checks for dependencies (`gemini` executable, Node.js version, etc.).
