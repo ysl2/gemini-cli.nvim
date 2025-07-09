@@ -6,6 +6,8 @@ local config = {
   side_position = 'right', -- 'left' or 'right'
   float_width_ratio = 0.8,
   float_height_ratio = 0.8,
+  set_default_keymap = true,
+  toggle_keymap = '<F3>',
 }
 
 -- Holds the state of the running Gemini session.
@@ -95,6 +97,10 @@ function M.setup(user_config)
     nargs = 0,
     desc = 'Show, hide, or run Gemini'
   })
+
+  if config.set_default_keymap then
+    vim.keymap.set('n', config.toggle_keymap, '<Cmd>Gemini<CR>', { noremap = true, silent = true, desc = 'Toggle Gemini Window' })
+  end
 end
 
 return M
