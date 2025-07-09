@@ -55,8 +55,7 @@ local function gemini_command()
   -- First run: Create the server, buffer, process, and window.
   local server_addr = vim.v.servername
   if not server_addr or #server_addr == 0 then
-    local socket_path = vim.fn.stdpath('run') .. '/gemini-nvim.sock'
-    vim.cmd('call serverstart("' .. socket_path .. '")')
+    vim.cmd('call serverstart()')
     server_addr = vim.v.servername
   end
 
