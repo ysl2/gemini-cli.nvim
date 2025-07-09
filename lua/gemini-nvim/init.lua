@@ -1,11 +1,18 @@
--- Stores the buffer and window IDs to manage the Gemini terminal session.
-local gemini_session = {
+local M = {}
+
+-- Default configuration, can be overridden by the user in the setup function.
+local config = {
+  window_style = 'float', -- Can be 'float' or 'side'
+}
+
+-- Holds the state of the running Gemini session.
+local session = {
   buf = nil,
   win = nil,
 }
 
 -- Defines the configuration for the floating window.
-local function get_win_config()
+local function get_float_win_config()
   local width = math.floor(vim.o.columns * 0.8)
   local height = math.floor(vim.o.lines * 0.8)
   return {
@@ -19,24 +26,33 @@ local function get_win_config()
   }
 end
 
-vim.api.nvim_create_user_command('Gemini', function()
-  -- If the window is already visible, hide it by closing it.
-  -- The bufhidden property will keep the buffer and terminal process alive.
-  if gemini_session.win and vim.api.nvim_win_is_valid(gemini_session.win) then
-    vim.api.nvim_win_close(gemini_session.win, false)
-    gemini_session.win = nil
+-- Opens the Gemini window based on the user's configuration.
+local function open_window()
+  if config.window_style == 'float' then
+    session.win = vim.api.nvim_open_win(session.buf, true, get_float_win_config())
+  else -- 'side'
+    vim.cmd('botright vsplit')
+    vim.api.nvim_win_set_buf(0, session.buf)
+    session.win = vim.api.nvim_get_current_win()
+  end
+end
+
+-- The main function for the :Gemini command.
+local function gemini_command()
+  -- If the window is already visible, hide it.
+  if session.win and vim.api.nvim_win_is_valid(session.win) then
+    vim.api.nvim_win_close(session.win, false)
+    session.win = nil
     return
   end
 
-  -- If the buffer exists but the window is hidden, just show the window again.
-  if gemini_session.buf and vim.api.nvim_buf_is_valid(gemini_session.buf) then
-    gemini_session.win = vim.api.nvim_open_win(gemini_session.buf, true, get_win_config())
+  -- If the buffer exists but the window is hidden, show it again.
+  if session.buf and vim.api.nvim_buf_is_valid(session.buf) then
+    open_window()
     return
   end
 
   -- First run: Create the server, buffer, process, and window.
-
-  -- Ensure the neovim server is running.
   local server_addr = vim.v.servername
   if not server_addr or #server_addr == 0 then
     local socket_path = vim.fn.stdpath('run') .. '/gemini-nvim.sock'
@@ -49,15 +65,29 @@ vim.api.nvim_create_user_command('Gemini', function()
     return
   end
 
-  -- Create a new buffer for the terminal.
-  gemini_session.buf = vim.api.nvim_create_buf(false, true)
-  -- This is the key: Keep the buffer loaded when its window is closed.
-  vim.bo[gemini_session.buf].bufhidden = 'hide'
+  session.buf = vim.api.nvim_create_buf(false, true)
+  vim.bo[session.buf].bufhidden = 'hide'
 
-  -- Create the floating window.
-  gemini_session.win = vim.api.nvim_open_win(gemini_session.buf, true, get_win_config())
+  open_window()
 
-  -- Start the Gemini process in the terminal.
   local cmd_to_run = string.format("NVIM_LISTEN_ADDRESS='%s' gemini", server_addr)
-  vim.fn.jobstart(cmd_to_run, { term = true })
-end, { nargs = 0, desc = 'Show, hide, or run Gemini in a floating terminal' })
+  vim.fn.jobstart(cmd_to_run, {
+    term = true,
+    on_exit = function()
+      -- Clean up the session state if the process terminates.
+      session.buf = nil
+      session.win = nil
+    end,
+  })
+end
+
+-- Public setup function for the plugin.
+function M.setup(user_config)
+  config = vim.tbl_deep_extend('force', config, user_config or {})
+  vim.api.nvim_create_user_command('Gemini', gemini_command, {
+    nargs = 0,
+    desc = 'Show, hide, or run Gemini'
+  })
+end
+
+return M
