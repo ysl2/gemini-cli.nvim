@@ -23,8 +23,7 @@ Here is an example using `lazy.nvim`. As this plugin is currently part of a mono
 ```lua
 -- lazy.nvim spec
 {
-  -- This path assumes you have the gemini-cli repository cloned locally.
-  dir = '~/path/to/your/gemini-cli/packages/nvim',
+  'JunYang-tes/gemini-nvim',
 
   -- Or, if you were to publish this as a standalone plugin:
   -- 'your-github-name/gemini.nvim',
