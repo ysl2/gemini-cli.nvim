@@ -2,7 +2,10 @@ local M = {}
 
 -- Default configuration, can be overridden by the user in the setup function.
 local config = {
-  window_style = 'float', -- Can be 'float' or 'side'
+  window_style = 'float', -- 'float' or 'side'
+  side_position = 'right', -- 'left' or 'right'
+  float_width_ratio = 0.8,
+  float_height_ratio = 0.8,
 }
 
 -- Holds the state of the running Gemini session.
@@ -13,8 +16,8 @@ local session = {
 
 -- Defines the configuration for the floating window.
 local function get_float_win_config()
-  local width = math.floor(vim.o.columns * 0.8)
-  local height = math.floor(vim.o.lines * 0.8)
+  local width = math.floor(vim.o.columns * config.float_width_ratio)
+  local height = math.floor(vim.o.lines * config.float_height_ratio)
   return {
     style = "minimal",
     relative = "editor",
@@ -31,7 +34,11 @@ local function open_window()
   if config.window_style == 'float' then
     session.win = vim.api.nvim_open_win(session.buf, true, get_float_win_config())
   else -- 'side'
-    vim.cmd('botright vsplit')
+    if config.side_position == 'left' then
+      vim.cmd('topleft vsplit')
+    else
+      vim.cmd('botright vsplit')
+    end
     vim.api.nvim_win_set_buf(0, session.buf)
     session.win = vim.api.nvim_get_current_win()
   end
@@ -55,7 +62,8 @@ local function gemini_command()
   -- First run: Create the server, buffer, process, and window.
   local server_addr = vim.v.servername
   if not server_addr or #server_addr == 0 then
-    vim.cmd('call serverstart()')
+    local socket_path = vim.fn.stdpath('run') .. '/gemini-nvim.sock'
+    vim.cmd('call serverstart("' .. socket_path .. '")')
     server_addr = vim.v.servername
   end
 
