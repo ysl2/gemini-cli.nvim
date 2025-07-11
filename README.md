@@ -2,6 +2,8 @@
 
 An unofficial Neovim plugin to interact with the Google Gemini CLI within a persistent terminal window.
 
+[![asciicast](https://asciinema.org/a/qCrA52b4s5lfnjQJRPc3Cnton.svg)](https://asciinema.org/a/qCrA52b4s5lfnjQJRPc3Cnton)
+
 ## Features
 
 - Run the `gemini` CLI in a terminal session that persists in the background.
