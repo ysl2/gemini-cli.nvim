@@ -18,6 +18,14 @@ An unofficial Neovim plugin to interact with the Google Gemini CLI within a pers
 - [Google Gemini CLI](https://github.com/google/gemini-cli) installed and available in your `$PATH`.
 - Node.js >= 20
 
+>NOTE
+>If you want to use the current Neovim instance when editing diffs, please install this: [Gemini fork](https://github.com/JunYang-tes/gemini-cli.nvim) ([npm](https://www.npmjs.com/package/gemini-cli-neovim)) instead of official [Google Gemini CLI](https://github.com/google/gemini-cli)
+>```bash
+>bun i -g gemini-cli-neovim
+>
+```
+```
+
 ## Installation
 
 Here is an example using `lazy.nvim`. As this plugin is currently part of a monorepo, you would need to point the `dir` to the local path of the package.
