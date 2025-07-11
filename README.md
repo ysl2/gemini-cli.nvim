@@ -4,6 +4,13 @@ An unofficial Neovim plugin to interact with the Google Gemini CLI within a pers
 
 [![asciicast](https://asciinema.org/a/qCrA52b4s5lfnjQJRPc3Cnton.svg)](https://asciinema.org/a/qCrA52b4s5lfnjQJRPc3Cnton)
 
+>**NOTE**
+>
+>If you want to use the current Neovim instance when editing diffs, please install this: [Gemini fork](https://github.com/JunYang-tes/gemini-cli.nvim) ([npm](https://www.npmjs.com/package/gemini-cli-neovim)) instead of official [Google Gemini CLI](https://github.com/google/gemini-cli)
+>```bash
+>bun i -g gemini-cli-neovim
+>```
+
 ## Features
 
 - Run the `gemini` CLI in a terminal session that persists in the background.
@@ -15,15 +22,10 @@ An unofficial Neovim plugin to interact with the Google Gemini CLI within a pers
 ## Requirements
 
 - Neovim >= 0.8
-- [Google Gemini CLI](https://github.com/google/gemini-cli) installed and available in your `$PATH`.
+- [Google Gemini CLI](https://github.com/google/gemini-cli) or  [Gemini fork](https://github.com/JunYang-tes/gemini-cli.nvim) ([npm](https://www.npmjs.com/package/gemini-cli-neovim)) installed and available in your `$PATH`.
 - Node.js >= 20
 
->NOTE
->
->If you want to use the current Neovim instance when editing diffs, please install this: [Gemini fork](https://github.com/JunYang-tes/gemini-cli.nvim) ([npm](https://www.npmjs.com/package/gemini-cli-neovim)) instead of official [Google Gemini CLI](https://github.com/google/gemini-cli)
->```bash
->bun i -g gemini-cli-neovim
->```
+
 
 ## Installation
 
@@ -33,9 +35,6 @@ Here is an example using `lazy.nvim`. As this plugin is currently part of a mono
 -- lazy.nvim spec
 {
   'JunYang-tes/gemini-nvim',
-
-  -- Or, if you were to publish this as a standalone plugin:
-  -- 'your-github-name/gemini.nvim',
 
   config = function()
     require('gemini-nvim').setup({
