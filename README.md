@@ -1,15 +1,24 @@
-# gemini.nvim
-
-An unofficial Neovim plugin to interact with the Google Gemini CLI within a persistent terminal window.
-
-[![asciicast](https://asciinema.org/a/qCrA52b4s5lfnjQJRPc3Cnton.svg)](https://asciinema.org/a/qCrA52b4s5lfnjQJRPc3Cnton)
-
 >**NOTE**
 >
 >If you want to use the current Neovim instance when editing diffs, please install this: [Gemini fork](https://github.com/JunYang-tes/gemini-cli.nvim) ([npm](https://www.npmjs.com/package/gemini-cli-neovim)) instead of official [Google Gemini CLI](https://github.com/google/gemini-cli)
 >```bash
 >bun i -g gemini-cli-neovim
 >```
+>If you are using npm
+>```bash
+>npm i -g gemini-cli-neovim
+># Installing globally with npm may require root privileges.
+>sudo npm i -g gemini-cli-neovim
+>```
+
+
+# gemini.nvim
+
+An unofficial Neovim plugin to interact with the Google Gemini CLI within a persistent terminal window.
+
+[![asciicast](https://asciinema.org/a/qCrA52b4s5lfnjQJRPc3Cnton.svg)](https://asciinema.org/a/qCrA52b4s5lfnjQJRPc3Cnton)
+
+
 
 ## Features
 
@@ -78,3 +87,9 @@ require('gemini-nvim').setup({
 - `:Gemini`: Toggles the Gemini terminal window (opens, hides, or shows it).
 - Press `<F3>` (or your configured keymap) to do the same.
 - `:checkhealth gemini`: Checks for dependencies (`gemini` executable, Node.js version, etc.).
+
+### Additional explanation for those unfamiliar with Terminal Mode:
+
+- In Normal Mode, press I to enter Terminal Mode, where you can interact with Gemini.
+
+- In Terminal Mode, press Ctrl+N or Ctrl+\ to return to Normal Mode, where you can press <F3> to close the Gemini window.
