@@ -11,6 +11,8 @@
 >sudo npm i -g gemini-cli-neovim
 >```
 
+**It is recommended to use gemini-cli-neovim, as it integrates better with Neovim.**
+
 
 # gemini.nvim
 
