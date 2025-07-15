@@ -1,20 +1,30 @@
 local M = {}
 
+---@class GeminiNvimConfig
+---@field window_style 'float' | 'side' # Style of the agent window.
+---@field side_position 'left' | 'right' # Position of the side window.
+---@field float_width_ratio number # Width of the float window as a ratio of the editor width.
+---@field float_height_ratio number # Height of the float window as a ratio of the editor height.
+---@field agents Agent[] # A list of agents to configure.
+
+---@class Agent
+---@field name string # The name of the agent.
+---@field program string # The command to run for the agent.
+---@field envs table # Environment variables to set for the agent.
+---@field toggle_keymap string # The keymap to toggle the agent window.
+
 -- Default configuration, can be overridden by the user in the setup function.
 local config = {
-  window_style = 'float', -- 'float' or 'side'
+  window_style = 'float',  -- 'float' or 'side'
   side_position = 'right', -- 'left' or 'right'
   float_width_ratio = 0.8,
   float_height_ratio = 0.8,
-  set_default_keymap = true,
-  toggle_keymap = '<F3>',
+  agents = {
+  }
 }
 
--- Holds the state of the running Gemini session.
-local session = {
-  buf = nil,
-  win = nil,
-}
+-- Holds the state of the running agent sessions, indexed by agent's position in the config table.
+local sessions = {}
 
 -- Defines the configuration for the floating window.
 local function get_float_win_config()
@@ -31,8 +41,8 @@ local function get_float_win_config()
   }
 end
 
--- Opens the Gemini window based on the user's configuration.
-local function open_window()
+-- Opens the agent window based on the user's configuration.
+local function open_window(session)
   if config.window_style == 'float' then
     session.win = vim.api.nvim_open_win(session.buf, true, get_float_win_config())
   else -- 'side'
@@ -46,18 +56,20 @@ local function open_window()
   end
 end
 
--- The main function for the :Gemini command.
-local function gemini_command()
+-- The main function for the agent command.
+local function toggle_agent_window(agent_index, agent)
+  local session = sessions[agent_index]
+
   -- If the window is already visible, hide it.
-  if session.win and vim.api.nvim_win_is_valid(session.win) then
+  if session and session.win and vim.api.nvim_win_is_valid(session.win) then
     vim.api.nvim_win_close(session.win, false)
     session.win = nil
     return
   end
 
   -- If the buffer exists but the window is hidden, show it again.
-  if session.buf and vim.api.nvim_buf_is_valid(session.buf) then
-    open_window()
+  if session and session.buf and vim.api.nvim_buf_is_valid(session.buf) then
+    open_window(session)
     return
   end
 
@@ -73,18 +85,28 @@ local function gemini_command()
     return
   end
 
-  session.buf = vim.api.nvim_create_buf(false, true)
+  sessions[agent_index] = {
+    buf = vim.api.nvim_create_buf(false, true),
+    win = nil,
+  }
+  session = sessions[agent_index]
   vim.bo[session.buf].bufhidden = 'hide'
 
-  open_window()
+  open_window(session)
 
-  local cmd_to_run = string.format("NVIM_LISTEN_ADDRESS='%s' gemini", server_addr)
+  local env_vars = ""
+  if agent.envs then
+    for k, v in pairs(agent.envs) do
+      env_vars = env_vars .. string.format("%s='%s' ", k, v)
+    end
+  end
+
+  local cmd_to_run = string.format("%sNVIM_LISTEN_ADDRESS='%s' %s", env_vars, server_addr, agent.program)
   vim.fn.jobstart(cmd_to_run, {
     term = true,
     on_exit = function()
       -- Clean up the session state if the process terminates.
-      session.buf = nil
-      session.win = nil
+      sessions[agent_index] = nil
     end,
   })
 end
@@ -92,14 +114,33 @@ end
 -- Public setup function for the plugin.
 function M.setup(user_config)
   config = vim.tbl_deep_extend('force', config, user_config or {})
-  vim.api.nvim_create_user_command('Gemini', gemini_command, {
-    nargs = 0,
-    desc = 'Show, hide, or run Gemini'
-  })
+  if #config.agents == 0 then
+    config.agents = {
+      {
+        name = 'Gemini',
+        program = 'gemini',
+        toggle_keymap = user_config.toggle_keymap or '<F3>'
+      }
+    }
+  end
+  print(vim.inspect(config))
 
-  if config.set_default_keymap then
-    vim.keymap.set('n', config.toggle_keymap, '<Cmd>Gemini<CR>', { noremap = true, silent = true, desc = 'Toggle Gemini Window' })
+  for i, agent in ipairs(config.agents) do
+    print("Setting up agent: " .. agent.name)
+    local command_name = agent.name
+    vim.api.nvim_create_user_command(command_name, function()
+      toggle_agent_window(i, agent)
+    end, {
+      nargs = 0,
+      desc = 'Show, hide, or run ' .. command_name
+    })
+
+    if agent.toggle_keymap then
+      vim.keymap.set('n', agent.toggle_keymap, '<Cmd>' .. command_name .. '<CR>',
+        { noremap = true, silent = true, desc = 'Toggle ' .. command_name .. ' Window' })
+    end
   end
 end
 
 return M
+
