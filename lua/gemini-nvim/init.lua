@@ -123,10 +123,8 @@ function M.setup(user_config)
       }
     }
   end
-  print(vim.inspect(config))
 
   for i, agent in ipairs(config.agents) do
-    print("Setting up agent: " .. agent.name)
     local command_name = agent.name
     vim.api.nvim_create_user_command(command_name, function()
       toggle_agent_window(i, agent)
