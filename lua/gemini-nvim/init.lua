@@ -53,6 +53,9 @@ local function open_window(session)
     end
     vim.api.nvim_win_set_buf(0, session.buf)
     session.win = vim.api.nvim_get_current_win()
+    if session.width then
+      vim.api.nvim_win_set_width(session.win, session.width)
+    end
   end
 end
 
@@ -62,6 +65,9 @@ local function toggle_agent_window(agent_index, agent)
 
   -- If the window is already visible, hide it.
   if session and session.win and vim.api.nvim_win_is_valid(session.win) then
+    if config.window_style == 'side' then
+      session.width = vim.api.nvim_win_get_width(session.win)
+    end
     vim.api.nvim_win_close(session.win, false)
     session.win = nil
     return
