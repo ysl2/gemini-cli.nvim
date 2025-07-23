@@ -92,6 +92,13 @@ local function toggle_agent_window(agent_index, agent)
   session = sessions[agent_index]
   vim.bo[session.buf].bufhidden = 'hide'
 
+  vim.api.nvim_create_autocmd("BufEnter", {
+    buffer = session.buf,
+    callback = function ()
+      vim.cmd("startinsert")
+    end
+  })
+
   open_window(session)
 
   local env_vars = ""
@@ -141,4 +148,3 @@ function M.setup(user_config)
 end
 
 return M
-
