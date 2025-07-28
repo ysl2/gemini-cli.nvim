@@ -147,7 +147,7 @@ function M.setup(user_config)
     })
 
     if agent.toggle_keymap then
-      vim.keymap.set('n', agent.toggle_keymap, '<Cmd>' .. command_name .. '<CR>',
+      vim.keymap.set({ 'n', 't' }, agent.toggle_keymap, '<Cmd>' .. command_name .. '<CR>',
         { noremap = true, silent = true, desc = 'Toggle ' .. command_name .. ' Window' })
     end
   end
