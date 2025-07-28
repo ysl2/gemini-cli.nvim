@@ -1,3 +1,6 @@
+> [!NOTE]
+> This repo is forked and minor changes from <https://github.com/JunYang-tes/gemini-nvim>, thanks to original author.
+
 >**NOTE**
 >
 >If you want to use the current Neovim instance when editing diffs, please install this: [Gemini fork](https://github.com/JunYang-tes/gemini-cli.nvim) ([npm](https://www.npmjs.com/package/gemini-cli-neovim)) instead of official [Google Gemini CLI](https://github.com/google/gemini-cli)
@@ -45,10 +48,10 @@ Here is an example using `lazy.nvim`. As this plugin is currently part of a mono
 ```lua
 -- lazy.nvim spec
 {
-  'JunYang-tes/gemini-nvim',
+  'ysl2/gemini-cli.nvim',
 
   config = function()
-    require('gemini-nvim').setup({
+    require('gemini-cli').setup({
       -- Your configuration goes here
     })
   end,
@@ -62,7 +65,7 @@ Call the `setup` function to configure the plugin. Here are all the available op
 ```lua
 -- init.lua
 
-require('gemini-nvim').setup({
+require('gemini-cli').setup({
   -- The style of the window to open.
   -- Can be 'float' or 'side'.
   window_style = 'float',
